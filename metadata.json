@@ -1,0 +1,7 @@
+{
+  "name": "Gemini Multi-Modal AI Suite",
+  "description": "An advanced application leveraging the Gemini API for comprehensive analysis of video, images, audio, and text with features like search grounding, complex reasoning, and creative video critique.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
