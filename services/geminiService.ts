@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { BRUTAL_TRUTH_PROMPT } from '../constants';
 import { TrendIntelligence, BrutalCritiqueResult } from "../types";
@@ -52,19 +53,25 @@ Output as brief JSON: {
         },
     });
 
-    let text = response.text.trim();
-    if (text.startsWith('```') && text.endsWith('```')) {
-      const startIndex = text.indexOf('{');
-      const endIndex = text.lastIndexOf('}');
-      if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-        text = text.substring(startIndex, endIndex + 1);
-      }
+    const text = response.text.trim();
+    
+    const startIndex = text.indexOf('{');
+    const endIndex = text.lastIndexOf('}');
+
+    if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+        const jsonString = text.substring(startIndex, endIndex + 1);
+        try {
+            const trendData = JSON.parse(jsonString);
+            trendData.sources = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+            return trendData;
+        } catch (e) {
+            console.error("Failed to parse JSON from trend intelligence response:", text);
+            throw new Error("The model's trend intelligence response was not valid JSON.");
+        }
     }
 
-    const trendData = JSON.parse(text);
-    trendData.sources = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-
-    return trendData;
+    console.error("Could not find JSON in trend intelligence response:", text);
+    throw new Error("Could not find a valid JSON object in the trend intelligence response.");
 }
 
 

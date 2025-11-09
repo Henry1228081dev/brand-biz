@@ -1,3 +1,4 @@
+// FIX: Add and export the 'Feature' type to resolve the import error in Header.tsx.
 export type Feature = 'critique' | 'image' | 'video' | 'search' | 'thinking' | 'audio';
 
 export interface TrendIntelligence {

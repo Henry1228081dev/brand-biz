@@ -1,42 +1,29 @@
-
-import React, { useState } from 'react';
-import Header from './components/Header';
-import ImageAnalyzer from './components/ImageAnalyzer';
-import VideoAnalyzer from './components/VideoAnalyzer';
-import GroundedSearch from './components/GroundedSearch';
-import ComplexQuery from './components/ComplexQuery';
-import AudioTranscriber from './components/AudioTranscriber';
+import React from 'react';
+import BrandAssetAnalyzer from './components/BrandAssetAnalyzer';
 import VideoCritique from './components/VideoCritique';
-import { Feature } from './types';
 
 const App: React.FC = () => {
-  const [activeFeature, setActiveFeature] = useState<Feature>('critique');
-
-  const renderActiveFeature = () => {
-    switch (activeFeature) {
-      case 'image':
-        return <ImageAnalyzer />;
-      case 'video':
-        return <VideoAnalyzer />;
-      case 'search':
-        return <GroundedSearch />;
-      case 'thinking':
-        return <ComplexQuery />;
-      case 'audio':
-        return <AudioTranscriber />;
-      case 'critique':
-        return <VideoCritique />;
-      default:
-        return <VideoCritique />;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 font-sans">
-      <Header activeFeature={activeFeature} setActiveFeature={setActiveFeature} />
+      <header className="bg-gray-800/50 backdrop-blur-sm sticky top-0 z-10 shadow-lg shadow-gray-900/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+           <h1 className="text-2xl font-bold text-center text-white">
+            Brand <span className="text-brand-primary">AI Suite</span>
+          </h1>
+        </div>
+      </header>
       <main className="p-4 sm:p-6 md:p-8">
-        <div className="max-w-4xl mx-auto">
-          {renderActiveFeature()}
+        <div className="max-w-4xl mx-auto space-y-16">
+          <section id="video-critique">
+            <VideoCritique />
+          </section>
+
+          <div className="border-t-2 border-dashed border-gray-700"></div>
+
+          <section id="asset-analysis">
+            <BrandAssetAnalyzer />
+          </section>
+
         </div>
       </main>
        <footer className="text-center p-4 text-gray-500 text-sm">

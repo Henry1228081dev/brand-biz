@@ -9,22 +9,20 @@ import ErrorAlert from './common/ErrorAlert';
 interface BrandConfigState {
   name: string;
   industry: string;
-  personality: string;
   platform: string;
-  tone: string;
-  logoRequired: boolean;
-  colors: string; // Comma-separated hex values
+  dna: string;
 }
 
 const ScoreBar: React.FC<{ label: string; score: number }> = ({ label, score }) => {
-    const width = `${(score / 10) * 100}%`;
-    const colorClass = score >= 7 ? 'bg-green-500' : score >= 4 ? 'bg-yellow-500' : 'bg-red-500';
+    const numericScore = score ?? 0;
+    const width = `${(numericScore / 10) * 100}%`;
+    const colorClass = numericScore >= 7 ? 'bg-green-500' : numericScore >= 4 ? 'bg-yellow-500' : 'bg-red-500';
     return (
         <div>
             <div className="flex justify-between items-center mb-1">
                 <span className="text-sm font-medium text-gray-300">{label}</span>
-                <span className={`text-sm font-bold ${score >= 7 ? 'text-green-400' : score >= 4 ? 'text-yellow-400' : 'text-red-400'}`}>
-                    {score.toFixed(1)} / 10
+                <span className={`text-sm font-bold ${numericScore >= 7 ? 'text-green-400' : numericScore >= 4 ? 'text-yellow-400' : 'text-red-400'}`}>
+                    {numericScore.toFixed(1)} / 10
                 </span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-2.5">
@@ -60,22 +58,19 @@ const ActionPlanItem: React.FC<{ item: ImmediateChange, index: number }> = ({ it
 const VideoCritique: React.FC = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [brandConfig, setBrandConfig] = useState<BrandConfigState>({
-    name: 'QuickBurger',
-    industry: 'fast food restaurant',
-    personality: 'Sassy, budget-friendly, confident',
-    platform: 'TikTok',
-    tone: 'Humorous, fast-paced',
-    logoRequired: true,
-    colors: '#FFC72C, #DA291C',
+    name: 'Quickburger',
+    industry: 'tast food restaurant',
+    platform: 'TIKTOK',
+    dna: 'Personality: Sassy, budget-friendly, confident Tone: Humc',
   });
   const [result, setResult] = useState<BrutalCritiqueResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [error, setError] = useState<string>('');
 
-  const handleConfigChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setBrandConfig(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  const handleConfigChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setBrandConfig(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async () => {
@@ -97,17 +92,15 @@ const VideoCritique: React.FC = () => {
 
       setLoadingMessage("🤖 Running Brutal Truth Engine...");
       
-      const formattedConfig = {
-        Name: brandConfig.name,
-        Industry: brandConfig.industry,
-        Personality: (brandConfig.personality || '').split(',').map(c => c.trim()).filter(Boolean),
-        "Required Colors (HEX)": (brandConfig.colors || '').split(',').map(c => c.trim()).filter(Boolean),
-        Platform: brandConfig.platform,
-        "Required Tone": (brandConfig.tone || '').split(',').map(c => c.trim()).filter(Boolean),
-        "Logo Required in First 3 Seconds": brandConfig.logoRequired,
-      };
+      const configString = `
+Brand Name: ${brandConfig.name}
+Industry: ${brandConfig.industry}
+Target Platform: ${brandConfig.platform}
 
-      const configString = JSON.stringify(formattedConfig, null, 2);
+Brand DNA & Rules:
+${brandConfig.dna}
+`;
+
       const trendString = JSON.stringify(trendData, null, 2);
       
       const critiqueResult = await critiqueVideo(videoFile, configString, trendString);
@@ -135,27 +128,37 @@ const VideoCritique: React.FC = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold text-center text-white">BrandAI: Brutal Truth Engine</h2>
-      <p className="text-center text-gray-400">Get a ruthless, actionable critique powered by real-time market data. Uses <code className="bg-gray-700 p-1 rounded">gemini-2.5-flash</code> for trends & <code className="bg-gray-700 p-1 rounded">gemini-2.5-pro</code> for critique.</p>
+      <p className="text-center text-gray-400">Get a ruthless, actionable critique powered by real-time market data.</p>
+       <div className="relative max-w-xs mx-auto">
+        <input
+            type="text"
+            value="gemini-2.5-pro"
+            disabled
+            readOnly
+            className="w-full text-center bg-gray-800/50 border border-gray-700 rounded-md py-1 px-3 text-sm text-gray-300 pointer-events-none"
+        />
+      </div>
       
-      <div className="space-y-6 p-4 bg-gray-800/50 rounded-lg">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="p-6 bg-gray-800/30 rounded-xl border border-gray-700">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">1. Upload Video Creative</h3>
             <FileUploader onFileSelect={setVideoFile} accept="video/*" label="a video creative" />
           </div>
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">2. Define Brand & Market Context</h3>
+            <h3 className="text-xl font-semibold">2. Define Brand DNA</h3>
             <div className="space-y-3">
-              <input type="text" name="name" placeholder="Brand Name" value={brandConfig.name} onChange={handleConfigChange} className="w-full p-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
-              <input type="text" name="industry" placeholder="Brand Industry" value={brandConfig.industry} onChange={handleConfigChange} className="w-full p-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
-              <input type="text" name="personality" placeholder="Personality (comma-separated)" value={brandConfig.personality} onChange={handleConfigChange} className="w-full p-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
-              <input type="text" name="tone" placeholder="Tone (comma-separated)" value={brandConfig.tone} onChange={handleConfigChange} className="w-full p-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
-               <input type="text" name="platform" placeholder="Platform (e.g., TikTok)" value={brandConfig.platform} onChange={handleConfigChange} className="w-full p-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
-              <input type="text" name="colors" placeholder="Brand Colors (comma-separated HEX)" value={brandConfig.colors} onChange={handleConfigChange} className="w-full p-2 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
-              <div className="flex items-center">
-                <input type="checkbox" name="logoRequired" id="logoRequired" checked={brandConfig.logoRequired} onChange={handleConfigChange} className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary" />
-                <label htmlFor="logoRequired" className="ml-2 block text-sm text-gray-300">Logo required in first 3 seconds?</label>
-              </div>
+              <input type="text" name="name" value={brandConfig.name} onChange={handleConfigChange} className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
+              <input type="text" name="industry" value={brandConfig.industry} onChange={handleConfigChange} className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
+              <input type="text" name="platform" value={brandConfig.platform} onChange={handleConfigChange} className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition" />
+              <textarea
+                name="dna"
+                placeholder="Describe your brand's DNA..."
+                value={brandConfig.dna}
+                onChange={handleConfigChange}
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-primary focus:outline-none transition h-24"
+                rows={4}
+              />
             </div>
           </div>
         </div>
